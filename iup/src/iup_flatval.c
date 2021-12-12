@@ -151,11 +151,15 @@ static int iFlatValMoveHandler(Ihandle* ih, int dx, int dy)
 
 static int iFlatValIsInsideHandler(Ihandle* ih, int x, int y)
 {
-  int is_horizontal = ih->data->orientation == IFLATVAL_HORIZONTAL;
+  int handler_size, is_horizontal = ih->data->orientation == IFLATVAL_HORIZONTAL;
   double percent;
   int p, p1, p2, pmid, handler_op_size;
 
-  int handler_size = iFlatValGetSliderInfo(ih, x, y, is_horizontal, &p, &p1, &p2, &handler_op_size);
+  if (x < 0 || x > ih->currentwidth - 1 ||
+      y < 0 || y > ih->currentheight - 1)
+    return 0;
+
+  handler_size = iFlatValGetSliderInfo(ih, x, y, is_horizontal, &p, &p1, &p2, &handler_op_size);
 
   percent = (ih->data->value - ih->data->vmin) / (ih->data->vmax - ih->data->vmin);
   if (!is_horizontal)
@@ -344,6 +348,29 @@ static void iFlatCallValueChangedCb(Ihandle* ih)
   iupBaseCallValueChangedCb(ih);
 }
 
+static int iFlatValUpdateHighlighted(Ihandle* ih, int x, int y)
+{
+  /* handle when mouse is pressed and moved to/from inside the handler area */
+  if (!iFlatValIsInsideHandler(ih, x, y))
+  {
+    if (ih->data->highlighted)
+    {
+      ih->data->highlighted = 0;
+      return 1;
+    }
+  }
+  else
+  {
+    if (!ih->data->highlighted)
+    {
+      ih->data->highlighted = 1;
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 static int iFlatValButton_CB(Ihandle* ih, int button, int pressed, int x, int y, char* status)
 {
   IFniiiis button_cb = (IFniiiis)IupGetCallback(ih, "FLAT_BUTTON_CB");
@@ -355,6 +382,8 @@ static int iFlatValButton_CB(Ihandle* ih, int button, int pressed, int x, int y,
 
   if (button == IUP_BUTTON1)
   {
+    iFlatValUpdateHighlighted(ih, x, y);
+
     if (pressed)
     {
       if (!iFlatValIsInsideHandler(ih, x, y))
@@ -412,25 +441,10 @@ static int iFlatValMotion_CB(Ihandle* ih, int x, int y, char* status)
       return IUP_DEFAULT;
   }
 
-  /* special highlight processing for handler area */
-  if (iFlatValIsInsideHandler(ih, x, y))
-  {
-    if (!ih->data->highlighted)
-    {
-      redraw = 1;
-      ih->data->highlighted = 1;
-    }
-  }
-  else
-  {
-    if (ih->data->highlighted)
-    {
-      redraw = 1;
-      ih->data->highlighted = 0;
-    }
-  }
+  /* must update always, and not just when button1 is pressed */
+  redraw = iFlatValUpdateHighlighted(ih, x, y);
 
-  if (ih->data->pressed)
+  if (iup_isbutton1(status))
   {
     if (iFlatValMoveHandler(ih, x - ih->data->start_x, y - ih->data->start_y))
     {
@@ -455,7 +469,6 @@ static int iFlatValMotion_CB(Ihandle* ih, int x, int y, char* status)
   if (redraw)
     iupdrvRedrawNow(ih);
 
-  (void)status;
   return IUP_DEFAULT;
 }
 

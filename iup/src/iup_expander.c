@@ -760,22 +760,27 @@ static int iExpanderAutoShowTimer_cb(Ihandle* auto_show_timer)
   return IUP_DEFAULT;
 }
 
+static void iExpanderSetExpandButtonHighlight(Ihandle* ih, Ihandle* expand_button, const char* value)
+{
+  iupAttribSet(expand_button, "HIGHLIGHT", value);
+  iExpanderUpdateStateImage(ih);
+
+  if (ih->data->position == IEXPANDER_TOP && ih->data->title_expand)
+  {
+    Ihandle* title_label = expand_button->brother;
+    iupAttribSet(title_label, "HIGHLIGHT", value);
+    iExpanderUpdateTitleState(ih);
+  }
+}
+
 static int iExpanderExpandButtonLeaveWindow_cb(Ihandle* expand_button)
 {
-  /* expander -> bar -> box -> (expand_button, ...) */
-  Ihandle* ih = IupGetParent(IupGetParent(IupGetParent(expand_button)));
-
   if (iupAttribGet(expand_button, "HIGHLIGHT"))
   {
-    iupAttribSet(expand_button, "HIGHLIGHT", NULL);
-    iExpanderUpdateStateImage(ih);
+    /* expander -> bar -> box -> (expand_button, ...) */
+    Ihandle* ih = IupGetParent(IupGetParent(IupGetParent(expand_button)));
 
-    if (ih->data->position == IEXPANDER_TOP && ih->data->title_expand)
-    {
-      Ihandle* title_label = expand_button->brother;
-      iupAttribSet(title_label, "HIGHLIGHT", NULL);
-      iExpanderUpdateTitleState(ih);
-    }
+    iExpanderSetExpandButtonHighlight(ih, expand_button, NULL);
 
     if (ih->data->auto_show)
     {
@@ -788,22 +793,13 @@ static int iExpanderExpandButtonLeaveWindow_cb(Ihandle* expand_button)
 
 static int iExpanderExpandButtonEnterWindow_cb(Ihandle* expand_button)
 {
-  /* expander -> bar -> box -> (expand_button, ...) */
-  Ihandle* ih = IupGetParent(IupGetParent(IupGetParent(expand_button)));
-
   if (!iupAttribGet(expand_button, "HIGHLIGHT"))
   {
+    /* expander -> bar -> box -> (expand_button, ...) */
+    Ihandle* ih = IupGetParent(IupGetParent(IupGetParent(expand_button)));
     Ihandle* child = ih->firstchild->brother;
 
-    iupAttribSet(expand_button, "HIGHLIGHT", "1");
-    iExpanderUpdateStateImage(ih);
-
-    if (ih->data->position == IEXPANDER_TOP && ih->data->title_expand)
-    {
-      Ihandle* title_label = expand_button->brother;
-      iupAttribSet(title_label, "HIGHLIGHT", "1");
-      iExpanderUpdateTitleState(ih);
-    }
+    iExpanderSetExpandButtonHighlight(ih, expand_button, "1");
 
     if (ih->data->auto_show &&
         child &&
@@ -815,18 +811,34 @@ static int iExpanderExpandButtonEnterWindow_cb(Ihandle* expand_button)
 
 static int iExpanderExpandButtonButton_CB(Ihandle* expand_button, int button, int pressed, int x, int y, char* status)
 {
-  if (button == IUP_BUTTON1 && pressed && !iup_isdouble(status))
+  if (button == IUP_BUTTON1)
   {
     /* expander -> bar -> box -> (expand_button, ...) */
     Ihandle* ih = IupGetParent(IupGetParent(IupGetParent(expand_button)));
 
-    if (ih->data->auto_show)
+    /* handle when mouse is pressed and moved to/from inside the canvas */
+    if (x < 0 || x > expand_button->currentwidth - 1 ||
+        y < 0 || y > expand_button->currentheight - 1)
     {
-      if (IupGetInt(ih->data->auto_show_timer, "RUN"))
-        IupSetAttribute(ih->data->auto_show_timer, "RUN", "NO");
+      if (iupAttribGet(expand_button, "HIGHLIGHT"))
+        iExpanderSetExpandButtonHighlight(ih, expand_button, NULL);
+    }
+    else
+    {
+      if (!iupAttribGet(expand_button, "HIGHLIGHT"))
+        iExpanderSetExpandButtonHighlight(ih, expand_button, "1");
     }
 
-    iExpanderOpenCloseChild(ih, 1, 1, ih->data->state == IEXPANDER_OPEN ? IEXPANDER_CLOSE : IEXPANDER_OPEN);
+    if (pressed && !iup_isdouble(status))
+    {
+      if (ih->data->auto_show)
+      {
+        if (IupGetInt(ih->data->auto_show_timer, "RUN"))
+          IupSetAttribute(ih->data->auto_show_timer, "RUN", "NO");
+      }
+
+      iExpanderOpenCloseChild(ih, 1, 1, ih->data->state == IEXPANDER_OPEN ? IEXPANDER_CLOSE : IEXPANDER_OPEN);
+    }
   }
 
   (void)x;
@@ -834,19 +846,25 @@ static int iExpanderExpandButtonButton_CB(Ihandle* expand_button, int button, in
   return IUP_DEFAULT;
 }
 
+static void iExpanderSetTitleHighlight(Ihandle* ih, Ihandle* title_label, const char* value)
+{
+  Ihandle* expand_button = IupGetChild(IupGetParent(title_label), 0);
+  iupAttribSet(expand_button, "HIGHLIGHT", value);
+  iExpanderUpdateStateImage(ih);
+
+  iupAttribSet(title_label, "HIGHLIGHT", value);
+  iExpanderUpdateTitleState(ih);
+}
+
 static int iExpanderTitleLeaveWindow_cb(Ihandle* title_label)
 {
   /* expander -> bar -> box -> (expand_button, title_label, ...) */
   Ihandle* ih = IupGetParent(IupGetParent(IupGetParent(title_label)));
 
-  if (ih->data->title_expand && iupAttribGet(title_label, "HIGHLIGHT"))
+  if (ih->data->title_expand)
   {
-    Ihandle* expand_button = IupGetChild(IupGetParent(title_label), 0);
-    iupAttribSet(expand_button, "HIGHLIGHT", NULL);
-    iExpanderUpdateStateImage(ih);
-
-    iupAttribSet(title_label, "HIGHLIGHT", NULL);
-    iExpanderUpdateTitleState(ih);
+    if (iupAttribGet(title_label, "HIGHLIGHT"))
+      iExpanderSetTitleHighlight(ih, title_label, NULL);
   }
   return IUP_DEFAULT;
 }
@@ -856,33 +874,41 @@ static int iExpanderTitleEnterWindow_cb(Ihandle* title_label)
   /* expander -> bar -> box -> (expand_button, title_label, ...) */
   Ihandle* ih = IupGetParent(IupGetParent(IupGetParent(title_label)));
 
-  if (ih->data->title_expand && !iupAttribGet(title_label, "HIGHLIGHT"))
+  if (ih->data->title_expand)
   {
-    Ihandle* expand_button = IupGetChild(IupGetParent(title_label), 0);
-    iupAttribSet(expand_button, "HIGHLIGHT", "1");
-    iExpanderUpdateStateImage(ih);
-
-    iupAttribSet(title_label, "HIGHLIGHT", "1");
-    iExpanderUpdateTitleState(ih);
+    if (!iupAttribGet(title_label, "HIGHLIGHT"))
+      iExpanderSetTitleHighlight(ih, title_label, "1");
   }
   return IUP_DEFAULT;
 }
 
 static int iExpanderTitleButton_CB(Ihandle* title_label, int button, int pressed, int x, int y, char* status)
 {
-  if (button == IUP_BUTTON1 && pressed && !iup_isdouble(status))
+  if (button == IUP_BUTTON1)
   {
     /* expander -> bar -> box -> (expand_button, title_label, ...) */
     Ihandle* ih = IupGetParent(IupGetParent(IupGetParent(title_label)));
 
     if (ih->data->title_expand)
     {
-      iExpanderOpenCloseChild(ih, 1, 1, ih->data->state == IEXPANDER_OPEN ? IEXPANDER_CLOSE : IEXPANDER_OPEN);
+      /* handle when mouse is pressed and moved to/from inside the canvas */
+      if (x < 0 || x > title_label->currentwidth - 1 ||
+          y < 0 || y > title_label->currentheight - 1)
+      {
+        if (iupAttribGet(title_label, "HIGHLIGHT"))
+          iExpanderSetTitleHighlight(ih, title_label, NULL);
+      }
+      else
+      {
+        if (!iupAttribGet(title_label, "HIGHLIGHT"))
+          iExpanderSetTitleHighlight(ih, title_label, "1");
+      }
+
+      if (pressed && !iup_isdouble(status))
+        iExpanderOpenCloseChild(ih, 1, 1, ih->data->state == IEXPANDER_OPEN ? IEXPANDER_CLOSE : IEXPANDER_OPEN);
     }
   }
 
-  (void)x;
-  (void)y;
   return IUP_DEFAULT;
 }
 

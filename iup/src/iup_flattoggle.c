@@ -329,6 +329,30 @@ static void iFlatToggleNotify(Ihandle* ih)
     iupBaseCallValueChangedCb(ih);
 }
 
+static int iFlatToggleUpdateHighlighted(Ihandle* ih, int x, int y)
+{
+  /* handle when mouse is pressed and moved to/from inside the canvas */
+  if (x < 0 || x > ih->currentwidth - 1 ||
+      y < 0 || y > ih->currentheight - 1)
+  {
+    if (ih->data->highlighted)
+    {
+      ih->data->highlighted = 0;
+      return 1;
+    }
+  }
+  else
+  {
+    if (!ih->data->highlighted)
+    {
+      ih->data->highlighted = 1;
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 static int iFlatToggleButton_CB(Ihandle* ih, int button, int pressed, int x, int y, char* status)
 {
   IFniiiis cb = (IFniiiis)IupGetCallback(ih, "FLAT_BUTTON_CB");
@@ -342,6 +366,8 @@ static int iFlatToggleButton_CB(Ihandle* ih, int button, int pressed, int x, int
   {
     Ihandle* radio = iupRadioFindToggleParent(ih);
     Ihandle* last_tg = NULL;
+
+    iFlatToggleUpdateHighlighted(ih, x, y);
 
     if (!pressed && ih->data->highlighted)  /* released inside the button area */
     {
@@ -415,24 +441,7 @@ static int iFlatToggleMotion_CB(Ihandle* ih, int x, int y, char* status)
 
   if (iup_isbutton1(status))
   {
-    /* handle when mouse is pressed and moved to/from inside the canvas */
-    if (x < 0 || x > ih->currentwidth - 1 ||
-        y < 0 || y > ih->currentheight - 1)
-    {
-      if (ih->data->highlighted)
-      {
-        redraw = 1;
-        ih->data->highlighted = 0;
-      }
-    }
-    else
-    {
-      if (!ih->data->highlighted)
-      {
-        redraw = 1;
-        ih->data->highlighted = 1;
-      }
-    }
+    redraw = iFlatToggleUpdateHighlighted(ih, x, y);
   }
 
   if (redraw)

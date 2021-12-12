@@ -388,6 +388,30 @@ static void iDropButtonNotify(Ihandle* ih, int pressed)
   iupdrvRedrawNow(ih);
 }
 
+static int iDropButtonUpdateHighlighted(Ihandle* ih, int x, int y)
+{
+  /* handle when mouse is pressed and moved to/from inside the canvas */
+  if (x < 0 || x > ih->currentwidth - 1 ||
+      y < 0 || y > ih->currentheight - 1)
+  {
+    if (ih->data->highlighted)
+    {
+      ih->data->highlighted = 0;
+      return 1;
+    }
+  }
+  else
+  {
+    if (!ih->data->highlighted)
+    {
+      ih->data->highlighted = 1;
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 static int iDropButtonMotion_CB(Ihandle* ih, int x, int y, char* status)
 {
   int drop_onarrow, over_arrow, redraw = 0;
@@ -412,24 +436,7 @@ static int iDropButtonMotion_CB(Ihandle* ih, int x, int y, char* status)
 
   if (iup_isbutton1(status) && !over_arrow)
   {
-    /* handle when mouse is pressed and moved to/from inside the canvas */
-    if (x < 0 || x > ih->currentwidth - 1 ||
-        y < 0 || y > ih->currentheight - 1)
-    {
-      if (ih->data->highlighted)
-      {
-        redraw = 1;
-        ih->data->highlighted = 0;
-      }
-    }
-    else
-    {
-      if (!ih->data->highlighted)
-      {
-        redraw = 1;
-        ih->data->highlighted = 1;
-      }
-    }
+    redraw |= iDropButtonUpdateHighlighted(ih, x, y);
   }
 
   if (redraw)
@@ -456,6 +463,8 @@ static int iDropButtonButton_CB(Ihandle* ih, int button, int pressed, int x, int
       ih->data->over_arrow = 1;
 
     ih->data->pressed = pressed;
+
+    iDropButtonUpdateHighlighted(ih, x, y);
 
     iDropButtonNotify(ih, pressed);
   }
