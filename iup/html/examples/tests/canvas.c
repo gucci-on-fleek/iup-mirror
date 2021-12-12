@@ -575,6 +575,12 @@ static int keypress_cb(Ihandle *ih, int c, int pressed)
   return IUP_DEFAULT;
 }
 
+static int touch_cb(Ihandle* ih, int id, int x, int y, char* state)
+{
+  printf("touch_cb(id=%d x=%d y=%d state=%s)\n", id, x, y, state);
+  return IUP_DEFAULT;
+}
+
 void CanvasTest(void)
 {
   Ihandle *dlg, *canvas, *box, *image;
@@ -643,6 +649,10 @@ void CanvasTest(void)
   // Windows and GTK Only  
   IupSetCallback(canvas, "DROPFILES_CB", (Icallback)dropfiles_cb);
 
+  IupSetAttribute(canvas, "TOUCH", "YES");
+  IupSetCallback(canvas, "TOUCH_CB", (Icallback)touch_cb);
+
+
 //{
 //  Ihandle* cnv = IupCanvas(NULL);
 //  IupAppend(box, cnv);
@@ -660,6 +670,8 @@ printf("IupMap\n");
 printf("IupShow\n");
   IupShow(dlg);
 //  IupSetAttribute(canvas, "RASTERSIZE", NULL);  /* release the minimum limitation */
+
+  printf("TOUCH=%s\n", IupGetAttribute(canvas, "TOUCH"));
 }
 
 #ifndef BIG_TEST

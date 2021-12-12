@@ -316,7 +316,7 @@ static int getfocus_cb(Ihandle* ih)
 
 static int killfocus_cb(Ihandle* ih)
 {
-  printf("KILLFOCUS_CB()\n");
+  printf("KILLFOCUS_CB(%s)\n", IupGetClassName(ih));
   return IUP_DEFAULT;
 }
 
@@ -487,10 +487,10 @@ static int rightclick_cb(Ihandle* ih, int id)
 static int active(Ihandle *ih)
 {
   Ihandle* tree = IupGetHandle("tree");
-  if (IupGetInt(tree, "ACTIVE"))
-    IupSetAttribute(tree, "ACTIVE", "NO");
-  else
-    IupSetAttribute(tree, "ACTIVE", "YES");
+//  if (IupGetInt(tree, "ACTIVE"))
+  //  IupSetAttribute(tree, "ACTIVE", "NO");
+ // else
+   // IupSetAttribute(tree, "ACTIVE", "YES");
   return IUP_DEFAULT;
 }
 
@@ -661,12 +661,13 @@ static void init_tree(void)
 /* Initializes the dlg */
 static void init_dlg(void)
 {
-  Ihandle* butactv, *butnext, *butprev, *butmenu;
+  Ihandle* butactv, *butnext, *butprev, *butmenu, *txt;
   Ihandle* tree = IupGetHandle("tree");
   Ihandle* box = IupHbox(tree, IupVbox(butactv = IupButton("Active", NULL), 
                                        butnext = IupButton("Next", NULL), 
                                        butprev = IupButton("Prev", NULL), 
                                        butmenu = IupButton("Menu", NULL), 
+                                       txt = IupText(NULL),
                                        NULL), NULL);
   Ihandle* dlg = IupDialog(box) ;
   IupSetAttribute(dlg,  "TITLE",   "IupTree");
@@ -680,6 +681,8 @@ static void init_dlg(void)
   IupSetCallback(butnext, "ACTION", next);
   IupSetCallback(butprev, "ACTION", prev);
   IupSetCallback(butmenu, "ACTION", (Icallback)rightclick_cb);
+  IupSetCallback(butactv, "KILLFOCUS_CB", (Icallback)killfocus_cb);
+  IupSetCallback(txt, "KILLFOCUS_CB", (Icallback)killfocus_cb);
 
   IupSetHandle("dlg", dlg);
 }

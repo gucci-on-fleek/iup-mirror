@@ -100,13 +100,13 @@ static int killfocus_cb(Ihandle *ih)
 
 static int leavewindow_cb(Ihandle *ih)
 {
-  printf("LEAVEWINDOW_CB()\n");
+  printf("FLAT_LEAVEWINDOW_CB()\n");
   return IUP_DEFAULT;
 }
 
 static int enterwindow_cb(Ihandle *ih)
 {
-  printf("ENTERWINDOW_CB()\n");
+  printf("FLAT_ENTERWINDOW_CB()\n");
   return IUP_DEFAULT;
 }
 
@@ -127,8 +127,8 @@ void FlatValTest(void)
   IupSetCallback(val_v, "HELP_CB",      (Icallback)help_cb);
   IupSetCallback(val_v, "GETFOCUS_CB",  (Icallback)getfocus_cb); 
   IupSetCallback(val_v, "KILLFOCUS_CB", (Icallback)killfocus_cb);
-  IupSetCallback(val_v, "ENTERWINDOW_CB", (Icallback)enterwindow_cb);
-  IupSetCallback(val_v, "LEAVEWINDOW_CB", (Icallback)leavewindow_cb);
+  IupSetCallback(val_v, "FLAT_ENTERWINDOW_CB", (Icallback)enterwindow_cb);
+  IupSetCallback(val_v, "FLAT_LEAVEWINDOW_CB", (Icallback)leavewindow_cb);
   IupSetCallback(val_v, "K_ANY", (Icallback)k_any);
   IupSetAttribute(val_v, "EXPAND", "VERTICAL");
   IupSetAttribute(val_v, "TIP", "Val Tip");

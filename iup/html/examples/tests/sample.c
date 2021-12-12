@@ -457,6 +457,12 @@ static int dialog_custom_close(Ihandle* ih)
   return IUP_DEFAULT;
 }
 
+static int button_cb(Ihandle *ih, int but, int pressed, int x, int y, char* status)
+{
+  printf("BUTTON_CB(but=%c (%d), x=%d, y=%d [%s])\n", (char)but, pressed, x, y, status);
+  return IUP_DEFAULT;
+}
+
 void SampleTest(void)
 {
   Ihandle *mnu, *_hbox_1, *_cnv_1, *_vbox_1, *dlg, *img, *dial,
@@ -627,6 +633,7 @@ void SampleTest(void)
 //  IupSetAttribute(_cnv_1,"CANFOCUS","NO");
   IupSetCallback(_cnv_1, "ACTION", draw_cb);
   set_callbacks(_cnv_1);
+  IupSetCallback(_cnv_1, "BUTTON_CB", (Icallback)button_cb);
 
   _vbox_1 = IupVbox(
     _hbox_1,

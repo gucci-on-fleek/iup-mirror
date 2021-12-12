@@ -168,7 +168,22 @@ dlg = iup.dialog
         ;title="IupList"
       }
     },
-    iup.canvas{bgcolor="128 255 0"}
+    iup.canvas{bgcolor="128 255 0"},
+    iup.tree{
+       map_cb= function(t) 
+            t['addleaf0'] = 'primeiro'
+            t['addleaf0'] = 'segundo'
+       end,
+getfocus_cb = function (...)
+    print('  TREE getfocus', ...)
+  end,
+  killfocus_cb = function (...)
+    print('  TREE killfocus', ...)
+  end,
+  selection_cb = function (...)
+    print('  TREE selection', ...)
+  end,
+     }
     ;gap="5",alignment="ARIGHT",margin="5x5"
   }
   ;title="IupDialog Title", menu=mnu 
