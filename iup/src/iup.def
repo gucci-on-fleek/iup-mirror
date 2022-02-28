@@ -731,3 +731,4 @@ iupwinStrToSystem
 iupwinStrToSystemFilename
 iupwinStrToSystemLen
 iupwinStrWide2Char
+iupwinPostMessageFilter
