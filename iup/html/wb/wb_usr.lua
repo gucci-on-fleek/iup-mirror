@@ -2184,8 +2184,20 @@ wb_usr.tree =
               link= "../doxygen/group__assert.html"
             },
             {
+              name= {nl= "Auxiliary Draw"},
+              link= "../doxygen/group__auxdraw.html"
+            },
+            {
+              name= {nl= "Driver Draw API"},
+              link= "../doxygen/group__drvdraw.html"
+            },
+            {
               name= {nl= "Hash Table"},
               link= "../doxygen/group__table.html"
+            },
+            {
+              name= {nl= "Line Based Text File"},
+              link= "../doxygen/group__linefile.html"
             },
             {
               name= {nl= "Simple Array"},
@@ -2194,6 +2206,10 @@ wb_usr.tree =
             {
               name= {nl= "String Utilities"},
               link= "../doxygen/group__str.html"
+            },
+            {
+              name= {nl= "Text Mask"},
+              link= "../doxygen/group__mask.html"
             },
           }
         },
