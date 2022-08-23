@@ -1077,6 +1077,11 @@ static int winTreeSetTopItemAttrib(Ihandle* ih, const char* value)
   return 0;
 }
 
+static char* winTreeGetScrollVisibleAttrib(Ihandle* ih)
+{
+  return iupwinGetScrollVisibleAttrib(ih);
+}
+
 static int winTreeSetSpacingAttrib(Ihandle* ih, const char* value)
 {
   iupStrToInt(value, &ih->data->spacing);
@@ -3247,6 +3252,8 @@ void iupdrvTreeInitClass(Iclass* ic)
   iupClassRegisterAttribute(ic, "INDENTATION", winTreeGetIndentationAttrib, winTreeSetIndentationAttrib, NULL, NULL, IUPAF_DEFAULT);
   iupClassRegisterAttribute(ic, "SPACING", iupTreeGetSpacingAttrib, winTreeSetSpacingAttrib, IUPAF_SAMEASSYSTEM, "0", IUPAF_NOT_MAPPED);
   iupClassRegisterAttribute(ic, "TOPITEM", NULL, winTreeSetTopItemAttrib, NULL, NULL, IUPAF_WRITEONLY|IUPAF_NO_INHERIT);
+
+  iupClassRegisterAttribute(ic, "SCROLLVISIBLE", winTreeGetScrollVisibleAttrib, NULL, NULL, NULL, IUPAF_READONLY | IUPAF_NO_INHERIT);
 
   /* IupTree Attributes - IMAGES */
   iupClassRegisterAttributeId(ic, "IMAGE", NULL, winTreeSetImageAttrib, IUPAF_IHANDLENAME|IUPAF_WRITEONLY|IUPAF_NO_INHERIT);

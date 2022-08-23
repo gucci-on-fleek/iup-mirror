@@ -269,6 +269,7 @@ static int button_cb(Ihandle *ih,int but,int pressed,int x,int y,char* status)
   pos = IupConvertXYToPos(ih, x, y);
   IupTextConvertPosToLinCol(ih, pos, &lin, &col);
   printf("         (lin=%d, col=%d, pos=%d)\n", lin, col, pos);
+  printf("SCROLLVISIBLE=%s\n", IupGetAttribute(ih, "SCROLLVISIBLE"));
   return IUP_DEFAULT;
 }
 

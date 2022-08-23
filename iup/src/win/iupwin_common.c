@@ -94,6 +94,38 @@ IUP_SDK_API void iupdrvActivate(Ihandle* ih)
     IupSetAttribute(ih, "VALUE", "TOGGLE");
 }
 
+int iupwinIsScrollbarVisible(Ihandle* ih, int flag)
+{
+  SCROLLBARINFO si;
+  LONG idObject;
+  ZeroMemory(&si, sizeof(SCROLLBARINFO));
+  si.cbSize = sizeof(SCROLLBARINFO);
+
+  if (flag == SB_HORZ)
+    idObject = OBJID_HSCROLL;
+  else
+    idObject = OBJID_VSCROLL;
+
+  if (!GetScrollBarInfo(ih->handle, idObject, &si))
+    return 0;
+
+  if (si.rgstate[0] & STATE_SYSTEM_INVISIBLE ||
+      si.rgstate[0] & STATE_SYSTEM_OFFSCREEN)
+    return 0;
+
+  return 1;
+}
+
+char* iupwinGetScrollVisibleAttrib(Ihandle* ih)
+{
+  int sb_h = iupwinIsScrollbarVisible(ih, SB_HORZ);
+  int sb_v = iupwinIsScrollbarVisible(ih, SB_VERT);
+  if (sb_h && sb_v) return "YES";
+  if (sb_h) return "HORIZONTAL";
+  if (sb_v) return "VERTICAL";
+  return "NO";
+}
+
 IUP_SDK_API int iupdrvGetScrollbarSize(void)
 {
   int xv = GetSystemMetrics(SM_CXVSCROLL);

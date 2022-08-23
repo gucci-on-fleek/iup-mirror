@@ -36,6 +36,8 @@ static int dropdown_cb(Ihandle *ih, int state)
 static int dblclick_cb(Ihandle *ih, int pos, char *text)
 {
   printf("DBLCLICK_CB(%d - %s)\n", pos, text);
+
+  printf("SCROLLVISIBLE=%s\n", IupGetAttribute(ih, "SCROLLVISIBLE"));
   return IUP_DEFAULT;
 }
 

@@ -1708,6 +1708,14 @@ static char* winTextGetSpinValueAttrib(Ihandle* ih)
   return NULL;
 }
 
+static char* winTextGetScrollVisibleAttrib(Ihandle* ih)
+{
+  if (!ih->data->is_multiline)
+    return NULL;
+
+  return iupwinGetScrollVisibleAttrib(ih);
+}
+
 
 /****************************************************************************************/
 
@@ -2344,6 +2352,7 @@ void iupdrvTextInitClass(Iclass* ic)
   iupClassRegisterAttribute(ic, "SAVERTF", NULL, winTextSetSaveRtfAttrib, NULL, NULL, IUPAF_WRITEONLY | IUPAF_NO_INHERIT);
   iupClassRegisterAttribute(ic, "LOADRTFSTATUS", NULL, NULL, NULL, NULL, IUPAF_NO_INHERIT);
   iupClassRegisterAttribute(ic, "SAVERTFSTATUS", NULL, NULL, NULL, NULL, IUPAF_NO_INHERIT);
+  iupClassRegisterAttribute(ic, "SCROLLVISIBLE", winTextGetScrollVisibleAttrib, NULL, NULL, NULL, IUPAF_READONLY | IUPAF_NO_INHERIT);
 
   iupClassRegisterAttribute(ic, "CONTROLID", NULL, NULL, NULL, NULL, IUPAF_NO_INHERIT);
 }

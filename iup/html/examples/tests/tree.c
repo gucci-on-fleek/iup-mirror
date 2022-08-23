@@ -481,6 +481,8 @@ static int rightclick_cb(Ihandle* ih, int id)
 
   IupDestroy(popup_menu);
 
+  printf("SCROLLVISIBLE=%s\n", IupGetAttribute(ih, "SCROLLVISIBLE"));
+
   return IUP_DEFAULT;
 }
 
@@ -600,7 +602,7 @@ static void init_tree(void)
   IupSetCallback(tree, "BRANCHOPEN_CB",  (Icallback) branchopen_cb);
   IupSetCallback(tree, "DRAGDROP_CB",    (Icallback) dragdrop_cb);
   IupSetCallback(tree, "RIGHTCLICK_CB",  (Icallback) rightclick_cb);
-  IupSetCallback(tree, "K_ANY",          (Icallback) k_any_cb);
+//  IupSetCallback(tree, "K_ANY",          (Icallback) k_any_cb);
   IupSetCallback(tree, "SHOWRENAME_CB", (Icallback) showrename_cb);
   IupSetCallback(tree, "SELECTION_CB", (Icallback) selection_cb);
 //  IupSetCallback(tree, "MULTISELECTION_CB", (Icallback) multiselection_cb);
@@ -625,7 +627,7 @@ static void init_tree(void)
 //  IupSetAttribute(tree, "BGCOLOR", "128 0 255");
 
   IupSetAttribute(tree, "MARKMODE",     "MULTIPLE");
-  IupSetAttribute(tree, "SHOWRENAME",   "YES");
+ // IupSetAttribute(tree, "SHOWRENAME",   "YES");
  // IupSetAttribute(tree, "SHOWDRAGDROP", "YES");  /* internal D&D */
 //  IupSetAttribute(tree, "SHOWTOGGLE",   "YES");
 //  IupSetAttribute(tree, "MARKWHENTOGGLE", "YES");

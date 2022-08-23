@@ -145,6 +145,9 @@ static int wheel_cb(Ihandle *ih,float delta,int x,int y,char* status)
   update_scrollbar(ih, canvas_w, canvas_h);
   update_viewport(ih, canvas, IupGetFloat(ih, "POSX"), IupGetFloat(ih, "POSY"));
   IupRedraw(ih, 0);
+
+  printf("SCROLLVISIBLE=%s\n", IupGetAttribute(ih, "SCROLLVISIBLE"));
+  
   return IUP_DEFAULT;
 }
 
