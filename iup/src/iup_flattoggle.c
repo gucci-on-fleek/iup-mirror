@@ -393,7 +393,7 @@ static int iFlatToggleButton_CB(Ihandle* ih, int button, int pressed, int x, int
       {
         if (radio)
         {
-          last_tg = (Ihandle*)iupAttribGet(radio, "_IUP_FLAT_LASTTOGGLE");
+          last_tg = (Ihandle*)iupAttribGet(radio, "_IUP_FLATTOGGLE_LASTTOGGLE");
           if (iupObjectCheck(last_tg) && last_tg != ih)
           {
             last_tg->data->value = 0;
@@ -403,7 +403,7 @@ static int iFlatToggleButton_CB(Ihandle* ih, int button, int pressed, int x, int
           else
             last_tg = NULL;
 
-          iupAttribSet(radio, "_IUP_FLAT_LASTTOGGLE", (char*)ih);
+          iupAttribSet(radio, "_IUP_FLATTOGGLE_LASTTOGGLE", (char*)ih);
         }
 
         ih->data->value = 1;
@@ -654,7 +654,7 @@ static int iFlatToggleSetValueAttrib(Ihandle* ih, const char* value)
     /* can only set Radio to ON */
     if (iupStrBoolean(value))
     {
-      Ihandle* last_tg = (Ihandle*)iupAttribGet(radio, "_IUP_FLAT_LASTTOGGLE");
+      Ihandle* last_tg = (Ihandle*)iupAttribGet(radio, "_IUP_FLATTOGGLE_LASTTOGGLE");
       if (iupObjectCheck(last_tg) && last_tg != ih)
       {
         last_tg->data->value = 0;
@@ -662,7 +662,7 @@ static int iFlatToggleSetValueAttrib(Ihandle* ih, const char* value)
           iupdrvRedrawNow(last_tg);
       }
 
-      iupAttribSet(radio, "_IUP_FLAT_LASTTOGGLE", (char*)ih);
+      iupAttribSet(radio, "_IUP_FLATTOGGLE_LASTTOGGLE", (char*)ih);
       ih->data->value = 1;
     }
     else
@@ -777,10 +777,11 @@ static int iFlatToggleMapMethod(Ihandle* ih)
   Ihandle* radio = iupRadioFindToggleParent(ih);
   if (radio)
   {
-    if (!iupAttribGet(radio, "_IUP_FLAT_LASTTOGGLE"))
+    if (!iupAttribGet(radio, "_IUP_FLATTOGGLE_LASTTOGGLE"))
     {
       /* this is the first toggle in the radio, and then set it with VALUE=ON */
       ih->data->value = 1;
+      iupAttribSet(radio, "_IUP_FLATTOGGLE_LASTTOGGLE", (char*)ih);
     }
 
     /* make sure it has at least one name */

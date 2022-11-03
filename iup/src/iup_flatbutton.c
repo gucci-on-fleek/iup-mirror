@@ -660,6 +660,7 @@ static int iFlatButtonMapMethod(Ihandle* ih)
       {
         /* this is the first toggle in the radio, and then set it with VALUE=ON */
         ih->data->value = 1;
+        iupAttribSet(radio, "_IUP_FLATBUTTON_LASTTOGGLE", (char*)ih);
       }
 
       /* make sure it has at least one name */
