@@ -459,6 +459,7 @@ static int motToggleMapMethod(Ihandle* ih)
     {
       /* this is the first toggle in the radio, and the last toggle with VALUE=ON */
       iupAttribSet(ih, "VALUE","ON");
+      iupAttribSet(radio, "_IUPMOT_LASTTOGGLE", (char*)ih);
     }
 
     /* make sure it has at least one name */
